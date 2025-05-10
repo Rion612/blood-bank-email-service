@@ -1,6 +1,12 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const admin = require("firebase-admin");
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || "{}");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 require("dotenv").config();
 
@@ -71,6 +77,30 @@ app.post("/send-email", (req, res) => {
     console.log("Email sent:", info.response);
     res.status(200).send("Email sent successfully");
   });
+});
+
+app.post("/reset-password", async (req, res) => {
+  const { email, newPassword } = req.body;
+  const apiKey = req.headers["x-api-key"];
+  if (!apiKey) {
+    return res.status(403).send("Forbidden");
+  }
+  if (decrypt(apiKey) !== "RESET_PASSWORD") {
+    return res.status(403).send("Forbidden");
+  }
+  try {
+    const user = await admin.auth().getUserByEmail(email);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    await admin.auth().updateUser(user.uid, {
+      password: newPassword,
+    });
+    return res.status(200).send("Password reset successfully");
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return res.status(500).send("Error resetting password");
+  }
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
