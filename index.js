@@ -18,12 +18,12 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post("/send-email", (req, res) => {
-  const { email, subject, html } = req.body;
+  const { email, subject, text } = req.body;
   const mailOptions = {
     from: '"Smart Blood Connect" <smart.blood.connect@gmail.com>',
     to: email,
     subject: subject,
-    html: html,
+    text: text,
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
