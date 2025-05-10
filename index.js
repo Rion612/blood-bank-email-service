@@ -85,7 +85,7 @@ app.post("/reset-password", async (req, res) => {
   if (!apiKey) {
     return res.status(403).send("Forbidden");
   }
-  if (decrypt(apiKey) !== "RESET_PASSWORD") {
+  if (decrypt(apiKey) !== "SEND_EMAIL") {
     return res.status(403).send("Forbidden");
   }
   try {
