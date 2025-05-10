@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 app.post("/send-email", (req, res) => {
   const { email, subject, html } = req.body;
   const mailOptions = {
-    from: process.env.FROM_EMAIL,
+    from: '"Smart Blood Connect" <smart.blood.connect@gmail.com>',
     to: email,
     subject: subject,
     html: html,
